@@ -6,35 +6,34 @@ declare(strict_types=1);
 session_start();
 
     //store user input field
-    /*f (isset($_POST['submit']) === true) {
+     if (isset($_POST['submit']) === true) {
     $_SESSION['email'] = $_POST['email'];
     $_SESSION['street'] = $_POST['street'];
     $_SESSION['streetnumber'] = $_POST['streetnumber'];
     $_SESSION['city'] = $_POST['city'];
     $_SESSION['zipcode'] = $_POST['zipcode'];
-    }*/
+    }
 
 $streetErr = $streetnumberErr = $cityErr = $zipcodeErr = "";
 $email = $street = $streetnumber = $city = $zipcode = "";
 $emailErr = "";
+$isTime = "";
 
-//check if the input field is empty
-
-function complete() {
-    if (isset($_POST['email']) === isset($email) && isset($_POST['street']) === isset($street) && isset($_POST['streetnumber']) === isset($streetnumber) && isset($_POST['city']) === isset($city) && isset($_POST['zipcode']) === isset($zipcode)) {
-        echo '<div class="alert alert-primary" role="alert">' . "Your order has been sent" . '</div>';
-        echo '<div class="alert alert-primary" role="alert">' . "Your expected delivery time is  + $expectTime" . '</div>';
-    } else {
-        echo '<div class="alert alert-danger" role="alert">' . "Please complete the form !" . '</div>';
-    }
+// calculate delivery time
+if (isset($_POST["express_delivery"]) === true) {
+    $expectTime = date("H:i:a", strtotime("45 minutes"));
+} else {
+    $expectTime = date("H:i:a", strtotime("2 hours"));
 }
+
+
 
 //validation form
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['email']) === true && empty($_POST['email']) === false) {
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == true) {
-            $email = $_POST['email'];
+            $email = htmlspecialchars($_POST['email']);
         }
     else {
             $emailErr = "Email is required or invalid Email";
@@ -44,46 +43,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST["street"]) === true) {
         $streetErr = "Street name is required";
     } else {
-        $street = $_POST["street"];
+        $street = htmlspecialchars($_POST["street"]);
     }
 
     if (empty($_POST["streetnumber"]) === true || is_numeric($_POST["streetnumber"]) === false){
         $streetnumberErr = "Streetnumber is required or must contain only mumber";
     } else {
-        $streetnumber = $_POST['streetnumber'];
+        $streetnumber = htmlspecialchars($_POST['streetnumber']);
     }
 
 
     if (empty($_POST["city"]) === true) {
         $cityErr = "City is required";
     } else {
-        $city = $_POST['city'];
+        $city = htmlspecialchars($_POST['city']);
     }
 
     if (empty($_POST["zipcode"]) === true || is_numeric($_POST['zipcode']) === false) {
         $zipcodeErr = "zipcode is required or must contain only number";
     } else {
-        $zipcode = $_POST['zipcode'];
+        $zipcode = htmlspecialchars($_POST['zipcode']);
     }
 }
+
+//check if the input field is empty
 if (isset($_POST['submit']) === true ) {
+
+    function complete() {
+        global $email, $street, $streetnumber, $city, $zipcode, $expectTime;
+        if (isset($email) === true && isset($street) === true && isset($streetnumber) === true && isset($city) === true && isset($zipcode) === true) {
+            echo '<div class="alert alert-primary" role="alert">' . "Your order has been sent" . '</div>';
+            echo '<div class="alert alert-primary" role="alert">' . "Your expected delivery time is ".$expectTime.'</div>';
+        } else {
+            echo '<div class="alert alert-danger" role="alert">' . "Please complete the form !" . '</div>';
+        }
+    }
     complete();
 }
 
-/*setcookie("emial", string($email));
-setcookie("street", string($street));
-setcookie("streetnumber", string($streetnumber));
-setcookie("city", string($city));
-setcookie("zipcode", string($zipcode));
-
-if (isset($_COOKIE[$email])){
-    $email = $_POST['email'];
-}*/
-/*echo $email;
-echo $street;
-echo $streetnumber;
-echo $city;
-echo $zipcode;*/
 
 
 function whatIsHappening() {
@@ -97,38 +94,36 @@ function whatIsHappening() {
     var_dump($_SESSION);
 }
 //your products with their price.
- if (isset($_GET["food"]) && ($_GET["food"] == 0)) {
-     $products = [
-    ['name' => 'Cola', 'price' => 2],
-    ['name' => 'Fanta', 'price' => 2],
-    ['name' => 'Sprite', 'price' => 2],
-    ['name' => 'Ice-tea', 'price' => 3],
-];
-} else {
-    $products = [
-    ['name' => 'Club Ham', 'price' => 3.20],
-    ['name' => 'Club Cheese', 'price' => 3],
-    ['name' => 'Club Cheese & Ham', 'price' => 4],
-    ['name' => 'Club Chicken', 'price' => 4],
-    ['name' => 'Club Salmon', 'price' => 5]
-];
-}
-//$name = $_GET['i'];
- if (isset($_GET['checkbox'])) {
-     print_r($_GET['checkbox']);
- }
 
-$isTime = "";
- // calculate delivery time
-if (isset($_GET["express_delivery"]) === true) {
-    $isTime = date("H:i:a", strtotime("45 minutes"));
-} else {
-    $expectTime = date("H:i:a", strtotime("2 hours"));
-}
 
-echo $expectTime;
-echo $isTime;
+ if (isset($_GET["food"]) && $_GET["food"] == 0) {
+     //$value = isset($_GET['food']) ? $_GET['food'] : $_POST['food'];
+     //if (isset($_GET['food']) == 0) {
+         $products = [
+             ['name' => 'Cola', 'price' => 2],
+             ['name' => 'Fanta', 'price' => 2],
+             ['name' => 'Sprite', 'price' => 2],
+             ['name' => 'Ice-tea', 'price' => 3],
+         ];
+     }
+ else {
+         $products = [
+             ['name' => 'Club Ham', 'price' => 3.20],
+             ['name' => 'Club Cheese', 'price' => 3],
+             ['name' => 'Club Cheese & Ham', 'price' => 4],
+             ['name' => 'Club Chicken', 'price' => 4],
+             ['name' => 'Club Salmon', 'price' => 5]
+         ];
+     }
+
+ foreach ($products AS $price => $value);
+    $value +=
+
 
 $totalValue = 0;
+
+
+
+
 
 require 'form-view.php';
